@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+<h1 class="center">Недавние опросы</h1>
+{% for i in range(8) %}
+    <ul class="list-group list-group-horizontal">
+        {% for j in range(4) %}
+        <a href="surveys/{{ i * j }}" class="list-group-item list-group-item-action active" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ surveys[i * j].title }}</h5>
+              <small>{{ surveys[i * j].created_date }}</small>
+            </div>
+            <p class="mb-1">Будет фото теста</p>
+            <small>{{ surveys[i * j].creator.surname }} {{ surveys[i * j].creator.name }}</small>
+        </a>
+        {% endfor %}
+    </ul>
+{% endfor %}
+{% block content %}
+
+{% endblock %}

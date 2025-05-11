@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="panel panel-default">
+    <div class="panel-heading"><h1 class="center">Вход</h1></div>
+    <div class="panel-body">
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(class="form-control", type="email") }}<br>
+                {% for error in form.email.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(class="form-control", type="password") }}<br>
+                {% for error in form.password.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+            <div class="row mt-30">
+                <div class="col-sm-6 text-left mb-25">
+                    <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+                    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+                    <div>{{ message }}</div>
+                </div>
+                <div class="col-sm-6 mb-25 text-right text-xs-left">
+                    <a href="forgotpassword" rel="nofollow">Забыли пароль?</a>
+                </div>
+            </div>
+
+        </form>
+        <hr>
+        <p></p>
+        <div>
+            Нет аккаунта?
+        </div>
+        Пожалуйста, пройдите
+        <a rel="nofollow" href="/register">
+            регистрацию
+        </a>
+        <p></p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Ваш профиль</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <img src={{url_for('static', filename='img/no_image.png' )}}>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col"><a href="/tests">Тесты:</a></th>
+                    <th scope="col"><a href="/surveys">Опросы:</a></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ current_user.tests|length }}</td>
+                    <td>{{ current_user.surveys|length }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col">
+        <main role="main" class="container">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/profile/settings">Настройки</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/profile/statistic">Статистика пройденного</a>
+                </li>
+            </ul>
+            {% block account_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

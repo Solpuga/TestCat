@@ -54,18 +54,21 @@ def register():
 
 @app.route('/edit_user', methods=['GET', 'POST'])
 @login_required
-def edit_user():
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.query(User).get(user_id)
+
+
+@app.route("/profile/settings")
+@login_required
+def account_settings():
     form = EditForm()
     # form.login.data = current_user.login
     form.surname.data = current_user.surname
     form.name.data = current_user.name
     form.email.data = current_user.email
-    form.phone_number.data = current_user.phone_number
     if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('edit_user.html', title='Редактирование профиля',
-                                   form=form,
-                                   message="Пароли не совпадают")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('edit_user.html', title='Редактирование профиля',
@@ -80,17 +83,15 @@ def edit_user():
         current_user.name = form.name.data
         current_user.email = form.email.data
         # current_user.phone_number = form.phone_number.data
-        current_user.set_password(form.password.data)
         current_user.modified_date = datetime.now
         db_sess.commit()
-        return redirect('/login')
-    return render_template('edit_user.html', title='Редактирование профиля', form=form)
+    return render_template("settings.html", form=form, title='Аккаунт')
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+@app.route("/profile/statistic")
+@login_required
+def account_statistic():
+    return render_template("statistic.html", title='Аккаунт')
 
 
 @app.route('/login', methods=['GET', 'POST'])

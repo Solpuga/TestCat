@@ -26,6 +26,6 @@ class EditForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired()])
     # phone_number = TelField('Номер телефона', validators=[DataRequired()])
     email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
+    # password = PasswordField('Пароль', validators=[DataRequired()])
+    # password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     submit = SubmitField('Сохранить')

@@ -27,16 +27,17 @@
                     </li>
                     {% if current_user.is_authenticated %}
                         <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Dropdown
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li>
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src={{url_for('static', filename="img/no_image.png")}} width="30" height="30">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="/profile/settings">Аккаунт</a>
+                                <a class="dropdown-item" href="/my_tests">Мои тесты</a><
+                                <a class="dropdown-item" href="/my_surveys">Мои опросы</a>
+                                <hr class="dropdown-divider">
+                                <a class="dropdown-item" href="/logout">Выйти</a>
+                            </div>
+                        </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="/login">Войти</a>

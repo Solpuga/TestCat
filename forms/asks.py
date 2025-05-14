@@ -9,5 +9,5 @@ class TestAsksForm(FlaskForm):
         (1, 'Вопрос с одиночным вариантом ответа'), (2, 'Вопрос с множественным вариантом ответа')])
     submit = SubmitField("Сохранить")
 
-class SurveyAskForm(FlaskForm):
+class SurveyAsksForm(FlaskForm):
     ask = StringField('Текст вопроса', validators=[DataRequired()])

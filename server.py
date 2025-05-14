@@ -6,7 +6,7 @@ from data.surveys import Survey
 from data.asks import Test_Ask, Survey_Ask
 from forms.users import LoginForm, RegisterForm, EditForm
 from forms.tests import TestsForm
-from forms.asks import TestAsksForm, SurveyAskForm
+from forms.asks import TestAsksForm, SurveyAsksForm
 from forms.surveys import SurveysForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import Flask, render_template, redirect, make_response, request, session, abort, jsonify, make_response
@@ -168,14 +168,6 @@ def my_tests():
     return render_template("my_tests.html", tests=tests, title='Мои тесты', y=math.ceil(len(tests) / 4), form=form)
 
 
-@app.route("/my_surveys")
-@login_required
-def my_surveys():
-    db_sess = db_session.create_session()
-    surveys = db_sess.query(Survey).filter(Survey.is_visible, Survey.creator == current_user).all()
-    return render_template("my_surveys.html", surveys=surveys, title='Мои опросы', y=math.ceil(len(surveys) / 4))
-
-
 @app.route('/edit_test/<int:test_id>', methods=['GET', 'POST'])
 @login_required
 def edit_tests(test_id):
@@ -217,10 +209,11 @@ def tests_delete(tests_id):
         abort(404)
     return redirect('/my_tests')
 
+
 @app.route('/add_ask/<int:test_id>', methods=['GET', 'POST'])
 @login_required
 def add_test_ask(test_id):
-    form = TestAsksForm
+    form = TestAsksForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         test = db_sess.query(Test).filter(Test.id == test_id).first()
@@ -237,7 +230,7 @@ def add_test_ask(test_id):
 @app.route('/my_tests/<int:tests_id>/edit_ask/<int:ask_id>', methods=['GET', 'POST'])
 @login_required
 def edit_test_ask(test_id, ask_id):
-    form = TestAskForm()
+    form = TestAsksForm()
     if request.method == "GET":
         db_sess = db_session.create_session()
         tests = db_sess.query(Test).filter(Test.id == test_id).first()
@@ -266,7 +259,7 @@ def edit_test_ask(test_id, ask_id):
 
 @app.route('/my_tests/<int:tests_id>/ask_delete/<int:ask_id>', methods=['GET', 'POST'])
 @login_required
-def ask_delete(ask_id):
+def test_ask_delete(ask_id):
     db_sess = db_session.create_session()
     ask = db_sess.query(Test_Ask).filter(Test_Ask.id == ask_id).first()
     if ask:
@@ -275,6 +268,116 @@ def ask_delete(ask_id):
     else:
         abort(404)
     return redirect('/my_tests')
+
+
+@app.route("/my_surveys")
+@login_required
+def my_surveys():
+    db_sess = db_session.create_session()
+    surveys = db_sess.query(Survey).filter(Survey.is_visible, Survey.creator == current_user).all()
+    return render_template("my_surveys.html", surveys=surveys, title='Мои опросы', y=math.ceil(len(surveys) / 4))
+
+
+@app.route('/edit_survey/<int:survey_id>', methods=['GET', 'POST'])
+@login_required
+def edit_surveys(survey_id):
+    form = SurveysForm()
+    db_sess = db_session.create_session()
+    surveys = db_sess.query(Survey).filter(Survey.id == survey_id, Survey.creator == current_user).first()
+    if request.method == "GET":
+        if surveys:
+            form.title.data = surveys.title
+            form.survey_type.data = surveys.survey_type
+            form.is_visible.data = surveys.is_visible
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        if surveys:
+            surveys.title = form.title.data
+            surveys.survey_type = form.survey_type.data
+            if surveys.asks:
+                surveys.is_visible = form.is_visible.data
+            db_sess.commit()
+            return redirect('/my_surveys')
+        else:
+            abort(404)
+    return render_template('edit_surveys.html',
+                           title='Редактирование тесты',
+                           form=form, survey=surveys
+                           )
+
+
+@app.route('/surveys_delete/<int:surveys_id>', methods=['GET', 'POST'])
+@login_required
+def surveys_delete(surveys_id):
+    db_sess = db_session.create_session()
+    surveys = db_sess.query(Survey).filter(Survey.id == surveys_id, Survey.creator == current_user).first()
+    if surveys:
+        db_sess.delete(surveys)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/my_surveys')
+
+
+@app.route('/add_ask/<int:survey_id>', methods=['GET', 'POST'])
+@login_required
+def add_survey_ask(survey_id):
+    form = SurveyAsksForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        survey = db_sess.query(Survey).filter(Survey.id == survey_id).first()
+        ask = Survey_Ask()
+        ask.text = form.ask.data
+        survey.asks.append(ask)
+        db_sess.merge(survey)
+        db_sess.commit()
+        return redirect('/add_survey')
+    return render_template('add_survey_ask.html', title='Добавление теста',
+                           form=form)
+
+
+@app.route('edit_survey_ask/<int:ask_id>', methods=['GET', 'POST'])
+@login_required
+def edit_survey_ask(ask_id):
+    form = SurveyAsksForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        surveys = db_sess.query(Survey_Ask).filter(Survey_Ask.id == ask_id, Survey_Ask.survey.creator == current_user).first()
+        if surveys:
+            form.title.data = surveys.title
+            form.survey_type.data = surveys.survey_type
+            form.is_visible.data = surveys.is_visible
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        surveys = db_sess.query(Survey).filter(Survey.id == survey_id).first()
+        if surveys:
+            surveys.title = form.title.data
+            surveys.survey_type = form.survey_type.data
+            surveys.is_visible = form.is_visible.data
+            db_sess.commit()
+            return redirect('/my_surveys')
+        else:
+            abort(404)
+    return render_template('departments.html',
+                           title='Редактирование департамента',
+                           form=form
+                           )
+
+
+@app.route('survey_ask_delete/<int:ask_id>', methods=['GET', 'POST'])
+@login_required
+def survey_ask_delete(ask_id):
+    db_sess = db_session.create_session()
+    ask = db_sess.query(Survey_Ask).filter(Survey_Ask.id == ask_id, Survey_Ask.survey.creator == current_user).first()
+    if ask:
+        db_sess.delete(ask)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/my_surveys')
 
 
 def main():

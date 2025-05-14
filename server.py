@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 from data.tests import Test
 from data.users import User
@@ -5,7 +6,7 @@ from data.surveys import Survey
 from data.asks import Test_Ask, Survey_Ask
 from forms.users import LoginForm, RegisterForm, EditForm
 from forms.tests import TestsForm
-from forms.asks import AsksForm
+from forms.asks import TestAsksForm, SurveyAskForm
 from forms.surveys import SurveysForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import Flask, render_template, redirect, make_response, request, session, abort, jsonify, make_response
@@ -52,8 +53,6 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route('/edit_user', methods=['GET', 'POST'])
-@login_required
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -119,12 +118,17 @@ def logout():
 @app.route("/tests")
 def show_tests():
     db_sess = db_session.create_session()
-    tests = db_sess.query(Test).filter(Test.is_visible)
-    return render_template("tests.html", tests=tests, title='Тесты')
+    tests = db_sess.query(Test).filter(Test.is_visible).all()
+    return render_template("tests.html", tests=tests, title='Тесты', y=math.ceil(len(tests) / 4))
+
+
+@app.route("/pashalka/228")
+def pashalka():
+    return render_template("pashalka.html")
 
 
 @app.route("/tests/<int:tests_id>")
-def show_test(tests_id):
+def testing(tests_id):
     db_sess = db_session.create_session()
     test = db_sess.query(Test).filter(Test.is_visible, Test.id == tests_id).first()
     if test:
@@ -136,46 +140,49 @@ def show_test(tests_id):
 @app.route("/surveys")
 def show_surveys():
     db_sess = db_session.create_session()
-    surveys = db_sess.query(Survey).filter(Survey.is_visible)
-    if surveys:
-        return render_template("surveys.html", surveys=surveys, title='Опросы')
-    else:
-        abort(404)
+    surveys = db_sess.query(Survey).filter(Survey.is_visible).all()
+    return render_template("surveys.html", surveys=surveys, title='Опросы', y=math.ceil(len(surveys) / 4))
 
 
 @app.route("/surveys/<int:surveys_id>")
-def show_survey(surveys_id):
+def surveying(surveys_id):
     db_sess = db_session.create_session()
     survey = db_sess.query(Survey).filter(Survey.is_visible, Survey.id == surveys_id).first()
     return render_template("survey.html", surveys=survey, title=survey.title)
 
 
-@app.route('/add_tests', methods=['GET', 'POST'])
+@app.route("/my_tests", methods=['GET', 'POST'])
 @login_required
-def add_tests():
+def my_tests():
+    db_sess = db_session.create_session()
+    tests = db_sess.query(Test).filter(Test.creator == current_user).all()
     form = TestsForm()
+    db_sess = db_session.create_session()
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        tests = Test()
-        tests.title = form.title.data
-        tests.creator_id = current_user.id
-        tests.is_visible = form.is_visible.data
-        tests.test_type = form.test_type.data
-        current_user.tests.append(tests)
-        db_sess.merge(current_user)
+        test = Test()
+        test.creator_id = current_user.id
+        test.title = form.title.data
+        current_user.tests.append(test)
         db_sess.commit()
-        return redirect('/my_tests')
-    return render_template('add_tests.html', title='Добавление теста',
-                           form=form)
+        return redirect(f'/edit_test/{db_sess.query(Test).filter(Test == test).first().id}')
+    return render_template("my_tests.html", tests=tests, title='Мои тесты', y=math.ceil(len(tests) / 4), form=form)
 
 
-@app.route('/edit_tests/<int:test_id>', methods=['GET', 'POST'])
+@app.route("/my_surveys")
+@login_required
+def my_surveys():
+    db_sess = db_session.create_session()
+    surveys = db_sess.query(Survey).filter(Survey.is_visible, Survey.creator == current_user).all()
+    return render_template("my_surveys.html", surveys=surveys, title='Мои опросы', y=math.ceil(len(surveys) / 4))
+
+
+@app.route('/edit_test/<int:test_id>', methods=['GET', 'POST'])
 @login_required
 def edit_tests(test_id):
     form = TestsForm()
+    db_sess = db_session.create_session()
+    tests = db_sess.query(Test).filter(Test.id == test_id, Test.creator == current_user).first()
     if request.method == "GET":
-        db_sess = db_session.create_session()
-        tests = db_sess.query(Test).filter(Test.id == test_id, Test.creator == current_user).first()
         if tests:
             form.title.data = tests.title
             form.test_type.data = tests.test_type
@@ -183,19 +190,18 @@ def edit_tests(test_id):
         else:
             abort(404)
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        tests = db_sess.query(Test).filter(Test.id == test_id, Test.creator == current_user).first()
         if tests:
             tests.title = form.title.data
             tests.test_type = form.test_type.data
-            tests.is_visible = form.is_visible.data
+            if tests.asks:
+                tests.is_visible = form.is_visible.data
             db_sess.commit()
             return redirect('/my_tests')
         else:
             abort(404)
     return render_template('edit_tests.html',
-                           title='Редактирование департамента',
-                           form=form
+                           title='Редактирование тесты',
+                           form=form, test=tests
                            )
 
 
@@ -211,23 +217,20 @@ def tests_delete(tests_id):
         abort(404)
     return redirect('/my_tests')
 
-
-@app.route('/my_tests/<test_id>/add_ask', methods=['GET', 'POST'])
+@app.route('/add_ask/<int:test_id>', methods=['GET', 'POST'])
 @login_required
-def add_test_ask(tests_id):
-    form = TestAskForm()
+def add_test_ask(test_id):
+    form = TestAsksForm
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        tests = Test()
-        tests.title = form.title.data
-        tests.creator_id = current_user.id
-        tests.is_visible = form.is_visible.data
-        tests.test_type = form.test_type.data
-        current_user.tests.append(tests)
-        db_sess.merge(current_user)
+        test = db_sess.query(Test).filter(Test.id == test_id).first()
+        ask = Test_Ask()
+        ask.text = form.ask.data
+        test.asks.append(ask)
+        db_sess.merge(test)
         db_sess.commit()
-        return redirect('/my_tests')
-    return render_template('tests.html', title='Добавление теста',
+        return redirect('/add_test')
+    return render_template('add_test_ask.html', title='Добавление теста',
                            form=form)
 
 

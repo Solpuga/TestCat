@@ -1,19 +1,41 @@
 {% extends "base.html" %}
-<h1 class="center">Недавние тесты</h1>
-{% for i in range(8) %}
-    <ul class="list-group list-group-horizontal">
-        {% for j in range(4) %}
-        <a href="tests/{{ i * j }}" class="list-group-item list-group-item-action active" aria-current="true">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{ tests[i * j].title }}</h5>
-              <small>{{ tests[i * j].created_date }}</small>
-            </div>
-            <p class="mb-1">Будет фото теста</p>
-            <small>{{ tests[i * j].creator.surname }} {{ tests[i * j].creator.name }}</small>
-        </a>
-        {% endfor %}
-    </ul>
-{% endfor %}
 {% block content %}
-
+<div class="container">
+    <br>
+    <h1 class="center">Недавние тесты</h1>
+    <br>
+    {% for i in range(y) %}
+    <div class="row justify-content-between">
+        {% if loop.last %}
+        {% for j in range(tests|length % 4) %}
+        <div class="col-2.5" style="border: 1px solid #ddd;">
+            <div class="card" style="width: 18rem;">
+                <img src={{url_for('static', filename='img/no_image.png' )}} class="card-img-top" alt="Картинка теста">
+                <div class="card-body">
+                    <h5 class="card-title">{{ tests[i * j].title }}</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <small>{{ tests[i * j].creator.surname }} {{ tests[i * j].creator.name }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        {% for j in range(4) %}
+        <div class="col-2.5" style="border: 1px solid #ddd;">
+            <div class="card" style="width: 18rem;">
+                <img src={{url_for('static', filename='img/no_image.png' )}} class="card-img-top" alt="Картинка теста">
+                <div class="card-body">
+                    <h5 class="card-title">{{ tests[i * j].title }}</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <small>{{ tests[i * j].creator.surname }} {{ tests[i * j].creator.name }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

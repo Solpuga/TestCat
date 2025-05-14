@@ -11,7 +11,7 @@ class Test_Ask(SqlAlchemyBase, SerializerMixin):
                            primary_key=True, autoincrement=True)
 
     text = sqlalchemy.Column(sqlalchemy.String)
-    img = sqlalchemy.Column(sqlalchemy.String)
+    img = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     answers = sqlalchemy.Column(sqlalchemy.String)
     correct_answers = sqlalchemy.Column(sqlalchemy.String)
     test_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("tests.id"))
@@ -25,7 +25,7 @@ class Survey_Ask(SqlAlchemyBase, SerializerMixin):
                            primary_key=True, autoincrement=True)
 
     text = sqlalchemy.Column(sqlalchemy.String)
-    img = sqlalchemy.Column(sqlalchemy.String)
+    img = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     answers = sqlalchemy.Column(sqlalchemy.String)
     survey_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("surveys.id"))
     survey = orm.relationship("Survey")

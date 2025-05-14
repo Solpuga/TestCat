@@ -24,7 +24,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                       default=datetime.datetime.now)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                       default=datetime.datetime.now)
-
     tests = orm.relationship("Test", back_populates='creator')
     surveys = orm.relationship('Survey', back_populates='creator')
 

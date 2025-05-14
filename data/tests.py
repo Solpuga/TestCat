@@ -11,9 +11,9 @@ class Test(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
 
-    title = sqlalchemy.Column(sqlalchemy.String)
-    test_type = sqlalchemy.Column(sqlalchemy.String)
-    is_visible = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    test_type = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    is_visible = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                       default=datetime.datetime.now)

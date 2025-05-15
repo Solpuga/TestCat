@@ -13,7 +13,6 @@ from flask import Flask, render_template, redirect, make_response, request, sess
 from flask_restful import Api
 from data import db_session
 from sqlalchemy.sql.expression import func
-from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)

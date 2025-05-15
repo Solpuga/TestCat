@@ -11,8 +11,10 @@ class Test(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
 
-    title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    test_type = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    title = sqlalchemy.Column(sqlalchemy.String)
+    test_type = sqlalchemy.Column(sqlalchemy.String)
+    img = sqlalchemy.Column(sqlalchemy.String, default='img/fon_cat.png')
+    description = sqlalchemy.Column(sqlalchemy.String)
     is_visible = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
@@ -22,7 +24,7 @@ class Test(SqlAlchemyBase, SerializerMixin):
     creator_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
 
     creator = orm.relationship("User")
-    asks = orm.relationship("Test_Ask", back_populates='test')
+    asks = orm.relationship("TestAsk", back_populates='test')
 
 
 

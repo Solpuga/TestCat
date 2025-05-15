@@ -21,7 +21,7 @@ class Survey(SqlAlchemyBase, SerializerMixin):
     creator_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
 
     creator = orm.relationship("User")
-    asks = orm.relationship("Survey_Ask", back_populates='survey')
+    asks = orm.relationship("SurveyAsk", back_populates='survey')
 
 
 

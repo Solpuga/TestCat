@@ -1,0 +1,18 @@
+<img src={{url_for('static', filename=ask.img)}} class="card-img-top" alt="Картинка вопроса">
+<div class="card-body">
+    <h5 class="card-title">{{ ask[0].text }}</h5>
+    <p class="card-text">
+        {% for j in ask.answers %}
+    <div class="form-check">
+        {% if j.is_correct %}
+        <input class="form-check-input" type="checkbox" value="" id="defaultCheck{{j.id}}">
+        {% else %}
+        <input class="form-check-input" type="checkbox" value="" id="defaultCheck{{j.id}}">
+        {% endif %}
+        <label class="form-check-label" for="defaultCheck{{j.id}}">
+            {{ j.text }}
+        </label>
+    </div>
+    {% endfor %}
+    </p>
+</div>

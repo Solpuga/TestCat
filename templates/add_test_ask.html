@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-
 {% block content %}
-
 <h1 class="page-header">Добавление тестового вопроса</h1>
-<form action="" method="post">
+<form action="" method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <p>
         {{ form.ask.label }}<br>
@@ -15,18 +13,77 @@
     {% endfor %}
     </p>
     <p>
-        {{ form.ask_type.label }}<br>
-        {{ form.ask_type(class="form-control") }}<br>
-        {% for error in form.ask_type.errors %}
+        {{ form.img.label }}<br>
+        {{ form.img(class="form-control") }}<br>
+        {% for error in form.img.errors %}
     <p class="alert alert-danger" role="alert">
         {{ error }}
     </p>
     {% endfor %}
     </p>
-
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ansModal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus"
+             viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+    </button>
+    <br>
+    {% for i in ask.answers %}
+    {% if i.is_correct %}
+    <input class="form-check-input" type="checkbox" value="" id="defaultCheck{{i.id}}" checked>
+    {% else %}
+    <input class="form-check-input" type="checkbox" value="" id="defaultCheck{{i.id}}">
+    {% endif %}
+    <label class="form-check-label" for="defaultCheck{{i.id}}">
+        {{ i.text }}
+    </label>
+    {% endfor %}
     <p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    <p>{{ form.save(type="submit", class="btn btn-primary") }}</p>
     <div>{{ message }}</div>
     </p>
 </form>
+<div class="modal fade show" id="ansModal" tabindex="-1" aria-labelledby="ansModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ansModalLabel">Новый ответ</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post">
+                    {{ ansform.hidden_tag() }}
+                    <p>
+                        {{ ansform.text.label }}<br>
+                        {{ ansform.text(class="form-control") }}<br>
+                        {% for error in ansform.text.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                    </p>
+                    <p>
+                        {{ ansform.is_correct.label }}<br>
+                        {{ ansform.is_correct(class="form-control") }}<br>
+                        {% for error in ansform.is_correct.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                    </p>
+                    </p>
+                    <p>{{ ansform.submit(type="submit", class="btn btn-primary") }}</p>
+                    <div>{{ message }}</div>
+                    </p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                <p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
